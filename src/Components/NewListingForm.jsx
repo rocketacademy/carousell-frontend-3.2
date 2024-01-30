@@ -3,6 +3,7 @@ import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 import { BACKEND_URL } from "../../constants";
 
@@ -13,7 +14,13 @@ const NewListingForm = () => {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [shippingDetails, setShippingDetails] = useState("");
+  const [email, setEmail] = useState("");
+  const [accessToken, setAccessToken] = useState("");
+
   const navigate = useNavigate();
+
+  const { loginWithRedirect, isAuthenticated, user, getAccessTokenSilently } =
+    useAuth0();
 
   const handleChange = (event) => {
     switch (event.target.name) {
@@ -45,14 +52,23 @@ const NewListingForm = () => {
 
     // Send request to create new listing in backend
     axios
-      .post(`${BACKEND_URL}/listings`, {
-        title,
-        category,
-        condition,
-        price,
-        description,
-        shippingDetails,
-      })
+      .post(
+        `${BACKEND_URL}/listings`,
+        {
+          title,
+          category,
+          condition,
+          price,
+          description,
+          shippingDetails,
+          email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
       .then((res) => {
         // Clear form state
         setTitle("");
@@ -66,6 +82,18 @@ const NewListingForm = () => {
         navigate(`/listings/${res.data.id}`);
       });
   };
+
+  useEffect(() => {
+    //if user not authenticated, prompt them to authenticate
+    if (!isAuthenticated) {
+      loginWithRedirect();
+    } else {
+      setEmail(user.email);
+      let token = getAccessTokenSilently();
+      setAccessToken(token);
+      console.log("token", token);
+    }
+  }, []);
 
   return (
     <Form onSubmit={handleSubmit}>

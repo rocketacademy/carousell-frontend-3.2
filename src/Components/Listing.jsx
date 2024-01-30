@@ -3,12 +3,18 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import { useAuth0 } from "@auth0/auth0-react";
 
 import { BACKEND_URL } from "../../constants.jsx";
 
 const Listing = () => {
   const [listingId, setListingId] = useState();
   const [listing, setListing] = useState({});
+  const [email, setEmail] = useState("");
+  const [accessToken, setAccessToken] = useState("");
+
+  const { loginWithRedirect, isAuthenticated, user, getAccessTokenSilently } =
+    useAuth0();
 
   useEffect(() => {
     // If there is a listingId, retrieve the listing data
@@ -37,9 +43,30 @@ const Listing = () => {
   }
 
   const handleClick = () => {
-    axios.put(`${BACKEND_URL}/listings/${listingId}`).then((response) => {
-      setListing(response.data);
-    });
+    if (!isAuthenticated) {
+      loginWithRedirect();
+    } else {
+      setEmail(user.email);
+      let token = getAccessTokenSilently();
+      setAccessToken(token);
+      console.log("token", token);
+
+      axios
+        .put(
+          `${BACKEND_URL}/listings/${listingId}`,
+          {
+            email,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        )
+        .then((response) => {
+          setListing(response.data);
+        });
+    }
   };
 
   return (
