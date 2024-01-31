@@ -23,7 +23,7 @@ const router = createBrowserRouter(
 
       <Route path="new" element={<NewListingForm />} />
       {/* Route that renders individual sightings */}
-      <Route path="sightings/:sightingId" element={<Listing />} />
+      <Route path="listings/:listingId" element={<Listing />} />
       {/* Route that matches all other paths */}
       <Route path="*" element={"Nothing here!"} />
     </Route>
@@ -35,9 +35,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     domain={import.meta.env.VITE_SOME_AUTH0_DOMAIN}
     clientId={import.meta.env.VITE_SOME_AUTH0_CLIENTID}
     authorizationParams={{
-      redirect_uri: import.meta.env.VITE_SOME_AUTH0_REDIRECTUR,
+      redirect_uri: import.meta.env.VITE_SOME_AUTH0_REDIRECTURL,
       audience: import.meta.env.VITE_SOME_AUTH0_AUDIENCE,
-      scope: "read:current_user update:current_user_metadata",
+      scope:
+        //to incldue openid, profile and email.
+        "read:current_user update:current_user_metadata openid profile email",
     }}
   >
     <RouterProvider router={router} />

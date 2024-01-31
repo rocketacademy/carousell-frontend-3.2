@@ -2,6 +2,7 @@ import logo from "/logo.png";
 import "./App.css";
 import { Outlet } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useEffect } from "react";
 
 const LoginButton = () => {
   const { loginWithRedirect } = useAuth0();

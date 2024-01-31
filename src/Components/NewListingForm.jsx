@@ -1,10 +1,11 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
 
 import { BACKEND_URL } from "../../constants";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const NewListingForm = () => {
   const [title, setTitle] = useState("");
@@ -14,6 +15,21 @@ const NewListingForm = () => {
   const [description, setDescription] = useState("");
   const [shippingDetails, setShippingDetails] = useState("");
   const navigate = useNavigate();
+
+  //authentication from Auth0
+
+  const { isAuthenticated, loginWithRedirect, getAccessTokenSilently, user } =
+    useAuth0();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      loginWithRedirect();
+    } else {
+      console.log("User:", user);
+      console.log("user email", user.email);
+      console.log("IsAuthenticated:", isAuthenticated);
+    }
+  }, [user, isAuthenticated]);
 
   const handleChange = (event) => {
     switch (event.target.name) {
@@ -39,20 +55,39 @@ const NewListingForm = () => {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     // Prevent default form redirect on submission
     event.preventDefault();
 
+    //get access token
+
+    const accessToken = await getAccessTokenSilently({
+      audience: import.meta.env.VITE_SOME_AUTH0_AUDIENCE,
+      scope: "read:current_user",
+    });
+
+    console.log(accessToken);
+
     // Send request to create new listing in backend
     axios
-      .post(`${BACKEND_URL}/listings`, {
-        title,
-        category,
-        condition,
-        price,
-        description,
-        shippingDetails,
-      })
+      .post(
+        `${BACKEND_URL}/listings`,
+        {
+          title,
+          category,
+          condition,
+          price,
+          description,
+          shippingDetails,
+          //send email to our backend
+          email: user.email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
       .then((res) => {
         // Clear form state
         setTitle("");
