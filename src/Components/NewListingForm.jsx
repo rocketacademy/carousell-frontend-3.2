@@ -80,7 +80,7 @@ const NewListingForm = () => {
           description,
           shippingDetails,
           //send email to our backend
-          email: user.email,
+          sellerEmail: user.email,
         },
         {
           headers: {
