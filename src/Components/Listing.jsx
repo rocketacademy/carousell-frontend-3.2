@@ -9,25 +9,23 @@ import { BACKEND_URL } from "../../constants.jsx";
 const Listing = () => {
 	const [listingId, setListingId] = useState();
 	const [listing, setListing] = useState({});
-	const [accessToken, setAccessToken] = useState("");
+	const [buyerId, setBuyerId] = useState("");
 
-	const {
-		user,
-		isAuthenticated,
-		loginWithRedirect,
-		getAccessTokenSilently,
-		logout,
-	} = useAuth0();
+	const { user, isAuthenticated, loginWithRedirect, getAccessTokenSilently } =
+		useAuth0();
 
-	const checkUser = async () => {
-		if (isAuthenticated) {
-			let token = await getAccessTokenSilently();
-			console.log("token", token);
-			setAccessToken(token);
-		} else {
-			loginWithRedirect();
-		}
+	const getUser = async () => {
+		const thisUser = await axios.get(`${BACKEND_URL}/listings/users/${user.email}`);
+		console.log(thisUser.data[0].id)
+		setBuyerId(thisUser.data[0].id)
 	};
+	useEffect(() => {
+		if (isAuthenticated && user) {
+			getUser();
+			console.log(user.email)
+		}
+	}, [user]);
+
 	useEffect(() => {
 		// If there is a listingId, retrieve the listing data
 		if (listingId) {
@@ -55,19 +53,28 @@ const Listing = () => {
 	}
 
 	const handleClick = () => {
-		checkUser();
-		axios
-			.put(`${BACKEND_URL}/listings/${listingId}`, {
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-				},
-			})
-			.then((response) => {
-				setListing(response.data);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		if (isAuthenticated) {
+			getAccessTokenSilently()
+				.then((res) =>
+					axios.put(
+						`${BACKEND_URL}/listings/${listingId}`,
+						{
+							buyerId: buyerId,
+						},
+						{
+							headers: {
+								Authorization: `Bearer ${res}`,
+							},
+						}
+					)
+				)
+				.then((res) => {
+					console.log(res.status);
+					setListing(res.data);
+				});
+		} else {
+			loginWithRedirect();
+		}
 	};
 
 	return (

@@ -13,6 +13,7 @@ const NewListingForm = () => {
 	const [price, setPrice] = useState("");
 	const [description, setDescription] = useState("");
 	const [shippingDetails, setShippingDetails] = useState("");
+	const [sellerId, setSellerId] = useState("")
 	const { user, isAuthenticated, loginWithRedirect, getAccessTokenSilently,  logout} =
 		useAuth0();
 	const [accessToken, setAccessToken] = useState("");
@@ -27,6 +28,17 @@ const NewListingForm = () => {
 			loginWithRedirect();
 		}
 	};
+	const getUser = async () => {
+		const thisUser = await axios.get(`${BACKEND_URL}/listings/users/${user.email}`);
+		console.log("seller id",thisUser.data[0].id)
+		setSellerId(thisUser.data[0].id)
+	};
+	useEffect(() => {
+		if (isAuthenticated && user) {
+			getUser();
+			console.log(user.email)
+		}
+	}, [user,isAuthenticated]);
 
 	useEffect(() => {
 		checkUser();
@@ -77,6 +89,7 @@ const NewListingForm = () => {
 					price,
 					description,
 					shippingDetails,
+					sellerId,
 				},
 				{
 					headers: {
