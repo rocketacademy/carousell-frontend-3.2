@@ -2,7 +2,8 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import { createRoot } from "react-dom/client";
+import { Auth0Provider } from "@auth0/auth0-react";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -30,5 +31,15 @@ const router = createBrowserRouter(
 );
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <RouterProvider router={router} />
+  <Auth0Provider
+    domain={import.meta.env.VITE_SOME_AUTH0_DOMAIN}
+    clientId={import.meta.env.VITE_SOME_AUTH0_CLIENTID}
+    authorizationParams={{
+      redirect_uri: import.meta.env.VITE_SOME_AUTH0_REDIRECTUR,
+      audience: import.meta.env.VITE_SOME_AUTH0_AUDIENCE,
+      scope: "read:current_user update:current_user_metadata",
+    }}
+  >
+    <RouterProvider router={router} />
+  </Auth0Provider>
 );
