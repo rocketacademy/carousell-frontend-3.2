@@ -79,7 +79,6 @@ const NewListingForm = () => {
           price,
           description,
           shippingDetails,
-          //send email to our backend
           sellerEmail: user.email,
         },
         {
