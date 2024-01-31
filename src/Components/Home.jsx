@@ -5,7 +5,7 @@ import ListingPreviewList from "./ListingPreviewList";
 const Home = () => {
   return (
     <div>
-      <Link to="/listings/new">Sell</Link>
+      <Link to="/new">Sell</Link>
       <br />
       <br />
       <ListingPreviewList />
