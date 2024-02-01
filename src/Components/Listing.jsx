@@ -3,12 +3,16 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import { useAuth0 } from "@auth0/auth0-react";
 
 import { BACKEND_URL } from "../../constants.jsx";
 
 const Listing = () => {
   const [listingId, setListingId] = useState();
   const [listing, setListing] = useState({});
+
+  const { loginWithRedirect, isAuthenticated, user, getAccessTokenSilently } =
+    useAuth0();
 
   useEffect(() => {
     // If there is a listingId, retrieve the listing data
@@ -36,10 +40,25 @@ const Listing = () => {
     }
   }
 
-  const handleClick = () => {
-    axios.put(`${BACKEND_URL}/listings/${listingId}`).then((response) => {
-      setListing(response.data);
-    });
+  const handleClick = async () => {
+    if (isAuthenticated) {
+      try {
+        // Retrieve access token
+        const accessToken = await getAccessTokenSilently({
+          // TODO: Replace with your own app's audience. Should be same as API identifier in above steps.
+          audience: import.meta.env.VITE_AUDIENCE,
+        });
+        console.log(accessToken, user);
+        const res = await axios.put(
+          `${BACKEND_URL}/listings/${listingId}`,
+          { buyerEmail: user.email },
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        setListing(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    } else loginWithRedirect();
   };
 
   return (
