@@ -1,10 +1,10 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { useNavigate } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../../constants";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const NewListingForm = () => {
   const [title, setTitle] = useState("");
@@ -13,6 +13,25 @@ const NewListingForm = () => {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [shippingDetails, setShippingDetails] = useState("");
+  const { loginWithRedirect, isAuthenticated, getAccessTokenSilently, user } = useAuth0();
+  const [email, setEmail] = useState("");
+  const [token, setToken] = useState("");
+
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setEmail(user.email)
+      getUserInfo();
+    } else {
+      loginWithRedirect();
+    }
+    
+    async function getUserInfo() {
+      let token = await getAccessTokenSilently();
+      setToken(token);
+    }
+  }, []);
+
   const navigate = useNavigate();
 
   const handleChange = (event) => {
@@ -45,14 +64,23 @@ const NewListingForm = () => {
 
     // Send request to create new listing in backend
     axios
-      .post(`${BACKEND_URL}/listings`, {
-        title,
-        category,
-        condition,
-        price,
-        description,
-        shippingDetails,
-      })
+      .post(
+        `${BACKEND_URL}/listings`,
+        {
+          title,
+          category,
+          condition,
+          price,
+          description,
+          shippingDetails,
+          email
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((res) => {
         // Clear form state
         setTitle("");
@@ -69,6 +97,9 @@ const NewListingForm = () => {
 
   return (
     <Form onSubmit={handleSubmit}>
+      <Link to="/">Return Home</Link>
+      <br />
+      <br />
       <Form.Group>
         <Form.Label>Title</Form.Label>
         <Form.Control
@@ -102,7 +133,7 @@ const NewListingForm = () => {
       <Form.Group>
         <Form.Label>Price ($)</Form.Label>
         <Form.Control
-          type="text"
+          type="number"
           name="price"
           value={price}
           onChange={handleChange}

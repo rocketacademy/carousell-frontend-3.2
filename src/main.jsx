@@ -20,9 +20,9 @@ const router = createBrowserRouter(
       {/* Route that renders home content */}
       <Route index element={<Home />} />
 
-      <Route path="new" element={<NewListingForm />} />
+      <Route path="listings/new" element={<NewListingForm />} />
       {/* Route that renders individual sightings */}
-      <Route path="sightings/:sightingId" element={<Listing />} />
+      <Route path="listings/:listingId" element={<Listing />} />
       {/* Route that matches all other paths */}
       <Route path="*" element={"Nothing here!"} />
     </Route>
