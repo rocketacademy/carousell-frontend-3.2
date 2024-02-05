@@ -15,11 +15,14 @@ const ListingPreviewList = () => {
     // Only run this effect on component mount
   }, []);
 
-  const listingPreviews = listings.map((listing) => (
-    <Link to={`/listings/${listing.id}`} key={listing.id}>
-      <ListingPreview data={listing} />
-    </Link>
-  ));
+  const listingPreviews = listings.map((listing) => {
+    console.log(listing);
+    return (
+      <Link to={`/listings/${listing.id}`} key={listing.id}>
+        <ListingPreview data={listing} />
+      </Link>
+    );
+  });
 
   return <div>{listingPreviews}</div>;
 };
