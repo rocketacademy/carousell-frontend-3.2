@@ -16,7 +16,7 @@ const ListingPreviewList = () => {
   }, []);
 
   const listingPreviews = listings.map((listing) => (
-    <Link to={`/listings/${listing.id}`} key={listing.id}>
+    <Link to={`/listing/${listing.id}`} key={listing.id}>
       <ListingPreview data={listing} />
     </Link>
   ));

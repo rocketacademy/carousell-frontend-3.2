@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
@@ -55,13 +55,13 @@ const NewListingForm = () => {
       .post(
         `${BACKEND_URL}/listings`,
         {
-          title,
           category,
           condition,
-          price,
           description,
-          shippingDetails,
           email,
+          price,
+          shippingDetails,
+          title,
         },
         {
           headers: {
@@ -79,20 +79,27 @@ const NewListingForm = () => {
         setShippingDetails("");
 
         // Navigate to listing-specific page after submitting form
-        navigate(`/listings/${res.data.id}`);
+        navigate(`/listing/${res.data.id}`);
       });
+  };
+
+  //check if user is authenticated
+  //if yes get access token
+  const checkUser = async () => {
+    if (isAuthenticated) {
+      let token = await getAccessTokenSilently();
+      console.log(`token`, token);
+      setAccessToken(token);
+      setEmail(user.email);
+    } else {
+      loginWithRedirect();
+    }
   };
 
   useEffect(() => {
     //if user not authenticated, prompt them to authenticate
-    if (!isAuthenticated) {
-      loginWithRedirect();
-    } else {
-      setEmail(user.email);
-      let token = getAccessTokenSilently();
-      setAccessToken(token);
-      console.log("token", token);
-    }
+    console.log("log", isAuthenticated);
+    checkUser();
   }, []);
 
   return (

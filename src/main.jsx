@@ -23,21 +23,27 @@ const router = createBrowserRouter(
 
       <Route path="new" element={<NewListingForm />} />
       {/* Route that renders individual sightings */}
-      <Route path="sightings/:sightingId" element={<Listing />} />
+      <Route path="listing/:listingId" element={<Listing />} />
       {/* Route that matches all other paths */}
       <Route path="*" element={"Nothing here!"} />
     </Route>
   )
 );
 
+//IMPORT FROM ENV
+const domain = import.meta.env.VITE_SOME_AUTH0_DOMAIN;
+const client = import.meta.env.VITE_SOME_AUTH0_CLIENT;
+const audience = import.meta.env.VITE_SOME_AUTH0_AUDIENCE;
+const scope = import.meta.env.VITE_SOME_AUTH0_SCOPE;
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Auth0Provider
-    domain="dev-nyqm348xxddvzu2e.us.auth0.com"
-    clientId="lSm1ituIdxUacwkbsd335QxnqRsXu4GX"
+    domain={domain}
+    clientId={client}
     authorizationParams={{
       redirect_uri: window.location.origin,
-      audience: "https://dev-nyqm348xxddvzu2e.us.auth0.com/api/v2/",
-      scope: "read:current_user update:current_user_metadata",
+      audience: `${audience}`,
+      scope: `${scope}`,
     }}
   >
     <RouterProvider router={router} />

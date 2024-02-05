@@ -42,31 +42,42 @@ const Listing = () => {
     }
   }
 
-  const handleClick = () => {
-    if (!isAuthenticated) {
-      loginWithRedirect();
-    } else {
-      setEmail(user.email);
-      let token = getAccessTokenSilently();
+  //check if user is authenticated
+  //if yes get access token
+  const checkUser = async () => {
+    if (isAuthenticated) {
+      let token = await getAccessTokenSilently();
+      console.log(`token`, token);
       setAccessToken(token);
-      console.log("token", token);
-
-      axios
-        .put(
-          `${BACKEND_URL}/listings/${listingId}`,
-          {
-            email,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        )
-        .then((response) => {
-          setListing(response.data);
-        });
+      setEmail(user.email);
+      console.log(`email`, user.email);
+    } else {
+      loginWithRedirect();
     }
+  };
+
+  useEffect(() => {
+    //if user not authenticated, prompt them to authenticate
+    console.log("log", isAuthenticated);
+    checkUser();
+  }, []);
+
+  const handleClick = async () => {
+    axios
+      .put(
+        `${BACKEND_URL}/listings/${listingId}`,
+        {
+          email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      .then((response) => {
+        setListing(response.data);
+      });
   };
 
   return (
