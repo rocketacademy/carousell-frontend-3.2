@@ -1,0 +1,55 @@
+#!/bin/bash
+
+finished=0
+
+	
+
+#function if user chose yes
+git_commit_push(){
+	echo "NOTE: If you do not have an upstream branch or repo, it will only commit your existing changes."
+	git add .
+	while true; do
+        echo "Your commit message:"
+        read message
+        if [[ -z $message ]]; then
+            echo "Commit message cannot be empty. Please try again."
+        else
+            break
+        fi
+    done
+	git commit -m "$message"
+	git push
+	finished=1
+}
+
+if [ -d "./.git" ]; then
+	git status
+	string=$(git status)
+	pattern='nothing to commit'
+	if [[ $string =~ $pattern ]]; then  
+
+	echo "There is nothing to commit. Exiting"
+	finished=1;
+else
+	while [ $finished -ne 1 ]
+	do 
+
+		echo "Would you like to add these changes to stage, commit, and push?"
+
+		echo "(y/n)"
+
+		read response;
+
+		case $response in
+			y) git_commit_push ;;
+			n) echo "You chose no, exiting.";finished=1;;
+			*) echo "Invalid input, CTRL-C to exit or select [n]"
+		esac
+	done;
+	fi
+else 
+	echo "There is no git repo here. Exiting"
+	finished=1
+fi
+
+
