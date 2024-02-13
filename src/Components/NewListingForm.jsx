@@ -56,7 +56,7 @@ const NewListingForm = () => {
 				setTitle(event.target.value);
 				break;
 			case "category":
-				setCategory(event.target.value);
+				setCategory(event.target.value)
 				break;
 			case "condition":
 				setCondition(event.target.value);

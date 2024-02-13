@@ -11,7 +11,7 @@ function App() {
 	const [currentUser, setCurrentUser] = useState("");
 	const { user, isAuthenticated } = useAuth0();
 	useEffect(() => {
-		if (user) {
+		if (isAuthenticated,user) {
 			axios
 				.post(`${BACKEND_URL}/listings/users`, {
 					email: user.email,
